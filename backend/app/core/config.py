@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+import logging
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -14,5 +14,16 @@ class Settings(BaseSettings):
     APP_NAME: str = "webhook-relay"
     DEBUG: bool = True
 
+
+def get_logger(name: str) -> logging.Logger:
+    logger = logging.getLogger(name)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter(
+            "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
+        ))
+        logger.addHandler(handler)
+        logger.setLevel(logging.INFO)
+    return logger
 
 settings = Settings()
