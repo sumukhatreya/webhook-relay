@@ -1,5 +1,7 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 import logging
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -19,11 +21,12 @@ def get_logger(name: str) -> logging.Logger:
     logger = logging.getLogger(name)
     if not logger.handlers:
         handler = logging.StreamHandler()
-        handler.setFormatter(logging.Formatter(
-            "%(asctime)s | %(name)s | %(levelname)s | %(message)s"
-        ))
+        handler.setFormatter(
+            logging.Formatter("%(asctime)s | %(name)s | %(levelname)s | %(message)s")
+        )
         logger.addHandler(handler)
         logger.setLevel(logging.INFO)
     return logger
+
 
 settings = Settings()
