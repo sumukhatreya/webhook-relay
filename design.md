@@ -46,6 +46,8 @@ flowchart TD
 | **React** | For the user dashboard. |
 | **Docker / Docker Compose** | All of the above components are run in Docker containers and orchestrated by Compose. |
 
+**Implementation note:** the initial build uses two physical RabbitMQ queues (ingestion and delivery). Retries are handled via Celery's built-in `self.retry(countdown=...)`, and dead-lettered events are tracked by database state. A later iteration will migrate to dedicated RabbitMQ retry and dead-letter queues using per-message TTL and dead-letter exchanges.
+
 ## Failure Modes
 
 **FastAPI failure:**
@@ -235,41 +237,61 @@ Pagination is enabled for all endpoints that return a list of items.
 
 `POST /orgs` - Create a new organization.
 
+
 ### Projects
 
 `GET /projects` - List projects.
+
 `POST /projects` - Create a project.
+
 `GET /projects/:id` - Get a project.
+
 `PUT /projects/:id` - Update a project.
+
 `DELETE /projects/:id` - Delete a project.
+
 
 ### Sources
 
 `GET /projects/:project_id/sources` - List sources.
+
 `POST /projects/:project_id/sources` - Create a source.
+
 `GET /projects/:project_id/sources/:id` - Get a source.
+
 `PUT /projects/:project_id/sources/:id` - Update a source.
+
 `DELETE /projects/:project_id/sources/:id` - Delete a source.
+
 
 ### Destinations
 
 `GET /projects/:project_id/destinations` - List destinations.
+
 `POST /projects/:project_id/destinations` - Create a destination.
+
 `GET /projects/:project_id/destinations/:id` - Get a destination.
+
 `PUT /projects/:project_id/destinations/:id` - Update a destination.
+
 `DELETE /projects/:project_id/destinations/:id` - Delete a destination.
 
 ### Connections
 
 `GET /projects/:project_id/connections` - List connections.
+
 `POST /projects/:project_id/connections` - Create a connection.
+
 `GET /projects/:project_id/connections/:id` - Get a connection.
+
 `PUT /projects/:project_id/connections/:id` - Update a connection.
+
 `DELETE /projects/:project_id/connections/:id` - Delete a connection.
 
 ### Requests
 
 `GET /projects/:project_id/requests` - List requests.
+
 `GET /projects/:project_id/requests/:id` - Get a request (includes full payload and headers).
 
 Supported filters (query params): `time_range`, `status`, `source_id`.
@@ -277,6 +299,7 @@ Supported filters (query params): `time_range`, `status`, `source_id`.
 ### Events
 
 `GET /projects/:project_id/events` - List events.
+
 `GET /projects/:project_id/events/:id` - Get an event (includes nested delivery attempts).
 
 Supported filters (query params): `status`, `connection_id`, `time_range`, `source_id`, `destination_id`.
