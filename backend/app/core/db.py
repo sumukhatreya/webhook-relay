@@ -17,7 +17,12 @@ AsyncSessionLocal = async_sessionmaker(async_engine, expire_on_commit=False)
 async def get_db():
     """FastAPI dependency."""
     async with AsyncSessionLocal() as session:
-        yield session
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
 
 
 # --- Sync side: used by Celery tasks and Alembic ---
